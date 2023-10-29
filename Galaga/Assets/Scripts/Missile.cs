@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Galaga
 {
-    public class Missile : MonoBehaviour, IPoolableObject
+    public class Missile : PoolableGameObject
     {
         [SerializeField]
         private bool _player = true;
@@ -17,13 +15,7 @@ namespace Galaga
 
         private Vector2 _start = Vector2.zero, _end = Vector2.zero;
 
-
-        private void Start()
-        {
-            OnSpawn();
-        }
-
-        public void OnSpawn()
+        public void Initialize()
         {
             _start = transform.position;
             if (_player)
@@ -39,7 +31,10 @@ namespace Galaga
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            Debug.Log(collision.collider.name);
+            if (collision.collider != null && collision.collider.TryGetComponent(out IDestroyable destroyable))
+                destroyable.Hit();
+
+            PoolObject();
         }
     }
 }
