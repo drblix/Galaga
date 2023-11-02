@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -71,6 +72,8 @@ namespace Galaga
             newObj.transform.SetPositionAndRotation(parameters.SpawnPosition, parameters.SpawnRotation);
             newObj.transform.SetParent(parameters.SpawnParent);
 
+            newObj.GetComponent<PoolableGameObject>().OnSpawn();
+
             return newObj;
         }
 
@@ -80,6 +83,74 @@ namespace Galaga
             objectPool[index].Add(poolableObject);
             poolableObject.gameObject.SetActive(false);
             poolableObject.transform.SetParent(_singleton.transform);
+        }
+
+        public static void PoolObject(PoolableGameObject poolableObject, float delay) => _singleton.StartCoroutine(_singleton.PoolObjectDelay(poolableObject, delay));
+
+        public IEnumerator PoolObjectDelay(PoolableGameObject obj, float d)
+        {
+            yield return new WaitForSeconds(d);
+            PoolObject(obj);
+        }
+
+        public readonly struct SpawnParameters
+        {
+            public readonly bool SpawnActive
+            {
+                get { return _spawnActive; }
+            }
+
+            public readonly Transform SpawnParent
+            {
+                get { return _spawnParent; }
+            }
+
+            public readonly Vector3 SpawnPosition
+            {
+                get { return _spawnPosition; }
+            }
+
+            public readonly Quaternion SpawnRotation
+            {
+                get { return _spawnRotation; }
+            }
+
+            private readonly bool _spawnActive;
+            private readonly Transform _spawnParent;
+            private readonly Vector3 _spawnPosition;
+            private readonly Quaternion _spawnRotation;
+
+            public SpawnParameters(Vector3 spawnPos, Quaternion spawnRotation, Transform parent, bool active)
+            {
+                this._spawnActive = active;
+                this._spawnParent = parent;
+                this._spawnPosition = spawnPos;
+                this._spawnRotation = spawnRotation;
+            }
+
+            public SpawnParameters(Vector3 spawnPos, Quaternion spawnRotation, Transform parent)
+            {
+                this._spawnActive = true;
+                this._spawnParent = parent;
+                this._spawnPosition = spawnPos;
+                this._spawnRotation = spawnRotation;
+            }
+
+            public SpawnParameters(Vector3 spawnPos, Quaternion spawnRotation)
+            {
+                this._spawnActive = true;
+                this._spawnParent = null;
+                this._spawnPosition = spawnPos;
+                this._spawnRotation = spawnRotation;
+            }
+
+            public SpawnParameters(Vector3 spawnPos)
+            {
+                this._spawnActive = true;
+                this._spawnParent = null;
+                this._spawnRotation = Quaternion.identity;
+                this._spawnPosition = spawnPos;
+            }
         }
     }
 
@@ -91,65 +162,5 @@ namespace Galaga
         Boss,
         PlayerMissile,
         EnemyMissile
-    }
-
-    public readonly struct SpawnParameters
-    {
-        public readonly bool SpawnActive
-        {
-            get { return _spawnActive; }
-        }
-
-        public readonly Transform SpawnParent
-        {
-            get { return _spawnParent; }
-        }
-
-        public readonly Vector3 SpawnPosition
-        {
-            get { return _spawnPosition; }
-        }
-
-        public readonly Quaternion SpawnRotation
-        {
-            get { return _spawnRotation; }
-        }
-
-        private readonly bool _spawnActive;
-        private readonly Transform _spawnParent;
-        private readonly Vector3 _spawnPosition;
-        private readonly Quaternion _spawnRotation;
-
-        public SpawnParameters(Vector3 spawnPos, Quaternion spawnRotation, Transform parent, bool active)
-        {
-            this._spawnActive = active;
-            this._spawnParent = parent;
-            this._spawnPosition = spawnPos;
-            this._spawnRotation = spawnRotation;
-        }
-
-        public SpawnParameters(Vector3 spawnPos, Quaternion spawnRotation, Transform parent)
-        {
-            this._spawnActive = true;
-            this._spawnParent = parent;
-            this._spawnPosition = spawnPos;
-            this._spawnRotation = spawnRotation;
-        }
-
-        public SpawnParameters(Vector3 spawnPos, Quaternion spawnRotation)
-        {
-            this._spawnActive = true;
-            this._spawnParent = null;
-            this._spawnPosition = spawnPos;
-            this._spawnRotation = spawnRotation;
-        }
-
-        public SpawnParameters(Vector3 spawnPos)
-        {
-            this._spawnActive = true;
-            this._spawnParent = null;
-            this._spawnRotation = Quaternion.identity;
-            this._spawnPosition = spawnPos;
-        }
     }
 }

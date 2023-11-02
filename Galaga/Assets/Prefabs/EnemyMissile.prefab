@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 2810067644511539227}
   - component: {fileID: 8672232275383817891}
   - component: {fileID: 1616749308538761038}
-  m_Layer: 6
-  m_Name: PlayerMissile
+  m_Layer: 7
+  m_Name: EnemyMissile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,9 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d5a4a2bf798d6b4aaf3e3fed0f877a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pooledObject: 4
-  _player: 1
-  _speed: 3.5
+  _pooledObject: 5
+  _player: 0
+  _speed: 0.7
   _rigidbody: {fileID: 8672232275383817891}
 --- !u!61 &2810067644511539227
 BoxCollider2D:

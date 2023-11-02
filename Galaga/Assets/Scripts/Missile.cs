@@ -21,10 +21,9 @@ namespace Galaga
             if (_player)
                 _end = new Vector2(_start.x, _start.y + 20f);
             else
-                _end = Vector2.one;
+                _end = FindAnyObjectByType<Fighter>().transform.position;
 
-            float lookAngle = Mathf.Atan2(_end.x - _start.x, _end.y - _start.y) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, 0f, lookAngle);
+            transform.rotation = Quaternion.LookRotation(Vector3.forward, _end - _start);
 
             _rigidbody.velocity = (_end - _start) * _speed;
         }

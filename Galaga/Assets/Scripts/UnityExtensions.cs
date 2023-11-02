@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Galaga
@@ -33,6 +34,11 @@ namespace Galaga
             else
                 Debug.LogError($"{gameObject.name} is NOT a poolable game object!");
         }
+
+        /// <summary>
+        /// Returns the angle (in degrees) that looks from the start position to the end position
+        /// </summary>
+        public static float GetLookAngle(Vector2 start, Vector2 end) => Mathf.Atan2(end.y - start.y, end.x - start.x) * Mathf.Rad2Deg;
     }
 }
 

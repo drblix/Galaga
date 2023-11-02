@@ -4,9 +4,9 @@ namespace Galaga
 {
     namespace AI
     {
-        public class Soldier : Enemy
+        public class Knight : Enemy
         {
-        
+
         }
-    }
+    }   
 }

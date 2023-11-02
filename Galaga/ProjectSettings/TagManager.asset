@@ -44,9 +44,15 @@ TagManager:
   - name: Background
     uniqueID: 3227635275
     locked: 0
+  - name: Missiles
+    uniqueID: 2536915009
+    locked: 0
   - name: Enemies
     uniqueID: 2459019099
     locked: 0
   - name: Player
     uniqueID: 1023723335
+    locked: 0
+  - name: UI
+    uniqueID: 4123672979
     locked: 0

@@ -13,6 +13,8 @@ namespace Galaga
         private PooledObject _pooledObject;
 
         public void PoolObject() => ObjectPool.PoolObject(this);
+
+        public virtual void OnSpawn() { }
     }
 }
 
