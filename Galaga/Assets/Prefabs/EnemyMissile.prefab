@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1616749308538761038}
   m_Layer: 7
   m_Name: EnemyMissile
-  m_TagString: Untagged
+  m_TagString: Missile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pooledObject: 5
   _player: 0
-  _speed: 0.7
+  _speed: 20
   _rigidbody: {fileID: 8672232275383817891}
 --- !u!61 &2810067644511539227
 BoxCollider2D:

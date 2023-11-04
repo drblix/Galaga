@@ -25,12 +25,12 @@ namespace Galaga
 
             transform.rotation = Quaternion.LookRotation(Vector3.forward, _end - _start);
 
-            _rigidbody.velocity = (_end - _start) * _speed;
+            _rigidbody.velocity = (_end - _start).normalized * _speed;
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.collider != null && collision.collider.TryGetComponent(out IDestroyable destroyable))
+            if (collision.collider != null && !collision.collider.CompareTag("Missile") && collision.collider.TryGetComponent(out IDestroyable destroyable))
                 destroyable.Hit();
 
             PoolObject();

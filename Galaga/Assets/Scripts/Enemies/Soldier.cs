@@ -6,7 +6,7 @@ namespace Galaga
     {
         public class Soldier : Enemy
         {
-        
+            
         }
     }
 }

@@ -52,6 +52,19 @@ namespace Galaga
 
                 yield return new WaitForSeconds(.25f);
             }
+
+            yield return new WaitForSeconds(3f);
+
+            for (int i = 0; i < 3; i++)
+            {
+                GameObject leftEnemy = ObjectPool.GetObject(PooledObject.Knight, new ObjectPool.SpawnParameters(Vector3.zero, Quaternion.identity, null, true));
+                leftEnemy.GetComponent<Enemy>().SpawnSequence(PathContainer.Singleton.GetCurve(CurveName.CloseGrazeFromLeft), 1.5f, 1f);
+
+                GameObject rightEnemy = ObjectPool.GetObject(PooledObject.Knight, new ObjectPool.SpawnParameters(Vector3.zero, Quaternion.identity, null, true));
+                rightEnemy.GetComponent<Enemy>().SpawnSequence(PathContainer.Singleton.GetCurve(CurveName.CloseGrazeFromRight), 1.5f, 1f);
+
+                yield return new WaitForSeconds(.25f);
+            }
         }
 
         private void Update()

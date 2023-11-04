@@ -47,13 +47,6 @@ namespace GalagaEditor
                 Vector3 pos = BezierCurve.CubicLerp(_handles[0].position, _handles[1].position, _handles[2].position, _handles[3].position, t);
                 _points[i] = new Point(pos);
             }
-
-            // assigning all directions
-            for (int i = 0; i < size; i++)
-            {
-                if (i != size - 1)
-                    _points[i].Direction = (_points[i + 1].Position - _points[i].Position).normalized;
-            }
         }
     }
 }

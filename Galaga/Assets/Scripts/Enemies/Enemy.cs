@@ -1,6 +1,5 @@
 using System.Collections;
-using System.Threading.Tasks;
-using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Galaga
@@ -19,16 +18,15 @@ namespace Galaga
 
             [SerializeField]
             protected AudioSource _source;
+
             [SerializeField]
             protected Animator _animator;
+
             [SerializeField]
             protected Collider2D _collider;
 
             [SerializeField]
             protected Spot _assignedSpot;
-
-            [SerializeField]
-            protected float _missileShootingHeight = -5f;
 
             protected static readonly int _explosionId = Animator.StringToHash("Explosion");
 
@@ -36,8 +34,9 @@ namespace Galaga
             protected float _formationTimer = 0f;
             protected float _diveThreshold;
 
-            protected float _missileThreshold;
-            protected float _missileTimer = 0f;
+            protected ushort _missilesToShoot = 0;
+            protected ushort _minMissiles = 0, _maxMissiles = 3;
+            protected readonly List<float> _firingTimes = new();
 
             protected virtual void Update()
             {
@@ -57,21 +56,6 @@ namespace Galaga
                     }
                     else
                         _formationTimer += Time.deltaTime;
-                }
-
-                if (_state == EnemyState.Diving)
-                {
-                    if (_missileTimer > _missileThreshold && transform.position.y > _missileShootingHeight)
-                    {
-                        // create new missile to shoot at player
-                        GameObject newMissile = ObjectPool.GetObject(PooledObject.EnemyMissile, new ObjectPool.SpawnParameters(transform.position, Quaternion.identity, null, true));
-                        newMissile.GetComponent<Missile>().Initialize();
-
-                        _missileTimer = 0f;
-                        _missileThreshold = Random.Range(.5f, 3.5f);
-                    }
-
-                    _missileTimer += Time.deltaTime;
                 }
             }
 
@@ -94,7 +78,7 @@ namespace Galaga
                 _hit = false;
                 _collider.enabled = true;
                 _diveThreshold = Random.Range(3.5f, 10f);
-                _missileThreshold = Random.Range(1f, 3.5f);
+                // _missileThreshold = Random.Range(1f, 3.5f);
 
                 RoundManager.Singleton.SpawnedEnemies.Add(this);
             }
@@ -106,7 +90,7 @@ namespace Galaga
 
             protected IEnumerator SpawnSequenceRoutine(BezierCurve curve, float pathDuration, float toSpotDuration)
             {
-                Spot spot = SpotManager.GetAvailableSpot();
+                Spot spot = SpotManager.GetAvailableSpot(this);
                 spot.FilledEnemy = this;
 
                 // wait for enemy to fly path
@@ -132,9 +116,17 @@ namespace Galaga
 
                 Vector2 control1 = new(Random.Range(-12.5f, 12.5f), Random.Range(10f, 20f));
                 Vector2 control2 = new(Random.Range(-18.5f, 18.5f), Random.Range(-13f, 0f));
-                //Vector2 endPosition = FindAnyObjectByType<Fighter>().transform.position;
                 Vector2 endPosition = new(-control2.x / 2f, -16.75f);
                 BezierCurve flightCurve = new (transform.position, control1, control2, endPosition);
+
+                // define times when to fire missiles
+                ushort numToAdd = (ushort)Random.Range(_minMissiles, _maxMissiles);
+                _firingTimes.Clear();
+
+                for (ushort i = 0; i < numToAdd; i++)
+                    _firingTimes.Add(Random.Range(.1f, .65f));
+
+                _firingTimes.Sort();
 
                 yield return FlyPath(flightCurve, diveSpeed);
 
@@ -144,6 +136,7 @@ namespace Galaga
                 transform.position = new Vector2(_assignedSpot.transform.position.x, 19f);
                 yield return FlyTo(_assignedSpot.transform.position, 1f);
 
+                transform.rotation = Quaternion.Euler(Vector3.zero);
                 _state = EnemyState.Formation;
                 _formationTimer = 0f;
             }
@@ -177,9 +170,36 @@ namespace Galaga
 
                 while (timer / duration < 1f)
                 {
-                    Vector2 posNow = curve.Calculate(timer / duration);
+                    float lerp = timer / duration;
+
+                    Vector2 posNow = curve.Calculate(lerp);
                     Vector2 nextPos = curve.Calculate((timer + Time.deltaTime) / duration);
                     transform.SetPositionAndRotation(posNow, Quaternion.LookRotation(Vector3.forward, nextPos - posNow));
+
+                    // checking if a missile should be fired at this point in the path
+                    if (_firingTimes.Count > 0)
+                    {
+                        if (lerp > _firingTimes[0])
+                        {
+                            GameObject missile = ObjectPool.GetObject(PooledObject.EnemyMissile, new ObjectPool.SpawnParameters(transform.position, Quaternion.identity, null, true));
+                            missile.GetComponent<Missile>().Initialize();
+
+                            _firingTimes.RemoveAt(0);
+                        }
+                    }
+
+                    /*
+                    for (int i = 0; i < _firingTimes.Count; i++)
+                    {
+                        if (timer / duration > _firingTimes[i])
+                        {
+                            GameObject missile = ObjectPool.GetObject(PooledObject.EnemyMissile, new ObjectPool.SpawnParameters(transform.position, Quaternion.identity, null, true));
+                            missile.GetComponent<Missile>().Initialize();
+
+                            _firingTimes.RemoveAt(i);
+                        }
+                    }
+                    */
 
                     timer += Time.deltaTime;
                     yield return new WaitForEndOfFrame();
